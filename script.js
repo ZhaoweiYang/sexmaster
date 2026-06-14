@@ -200,23 +200,25 @@ function closeDetail() {
 
 document.getElementById("detailBack").addEventListener("click", closeDetail);
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !detail.hidden) closeDetail();
+  if (e.key !== "Escape") return;
+  if (!unlock.hidden) closeUnlock();
+  else if (!detail.hidden) closeDetail();
 });
 detailSave.addEventListener("click", () => {
   if (currentDetail) { toggleSave(currentDetail.title); updateDetailSave(); }
 });
-document.getElementById("detailPlay").addEventListener("click", () => {
-  const first = epList.querySelector(".ep");
-  if (!first) return;
-  epList.querySelectorAll(".ep").forEach((x) => x.classList.remove("playing"));
-  first.classList.add("playing");
-  first.scrollIntoView({ behavior: "smooth", block: "center" });
+// ---- Unlock / paywall modal: shown whenever a user tries to view content ----
+const unlock = document.getElementById("unlock");
+const openUnlock = () => { unlock.hidden = false; document.body.classList.add("no-scroll"); };
+const closeUnlock = () => { unlock.hidden = true; document.body.classList.remove("no-scroll"); };
+unlock.addEventListener("click", (e) => {
+  // The unlock button is a real link; close only when tapping the backdrop
+  if (e.target.hasAttribute("data-close")) closeUnlock();
 });
+
+document.getElementById("detailPlay").addEventListener("click", openUnlock);
 epList.addEventListener("click", (e) => {
-  const ep = e.target.closest(".ep");
-  if (!ep) return;
-  epList.querySelectorAll(".ep").forEach((x) => x.classList.remove("playing"));
-  ep.classList.add("playing");
+  if (e.target.closest(".ep")) openUnlock();
 });
 
 grid.addEventListener("click", (e) => {
