@@ -471,8 +471,54 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   .plan.featured { transform: none; }
   .nav-links { display: none; }
 }
+
+@media (max-width: 720px) {
+  .nav { padding: 12px 16px; gap: 12px; }
+  .brand { font-size: 22px; }
+  .nav-actions { gap: 10px; }
+  .cta { padding: 11px 16px; font-size: 14px; }
+  .cta.lg { padding: 15px 26px; font-size: 16px; }
+
+  /* Horizontal-scrolling filter row instead of a tall wrap */
+  .filters {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: -16px;
+    padding: 0 16px 4px;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .chip { flex: 0 0 auto; }
+
+  .hero-trust { gap: 22px; }
+  .quotes blockquote { font-size: 19px; }
+  .foot-bottom { flex-direction: column; gap: 6px; }
+}
+
 @media (max-width: 560px) {
   .props, .grid, .steps { grid-template-columns: 1fr; }
-  .foot-cols { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .foot-cols { grid-template-columns: 1fr 1fr; gap: 28px 30px; }
   .nav-actions .ghost { display: none; }
+
+  /* Compact the shelf button to an icon + count */
+  .shelf-label { display: none; }
+  .shelf-btn { padding: 9px 12px; }
+
+  /* Tap-friendly hero buttons stack full width */
+  .hero-cta { flex-direction: column; align-items: stretch; }
+  .hero-cta .cta, .hero-cta .ghost { width: 100%; text-align: center; }
+
+  /* Slightly larger cards read better one-per-row */
+  .card-thumb { aspect-ratio: 16 / 10; }
+  .card-foot { flex-wrap: wrap; }
+  .add-shelf { width: 100%; text-align: center; }
+
+  .section-head p { font-size: 16px; }
+}
+
+@media (max-width: 380px) {
+  .brand { font-size: 20px; }
+  .cta { padding: 10px 13px; font-size: 13px; }
 }
