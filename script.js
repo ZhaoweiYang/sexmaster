@@ -160,14 +160,16 @@ function openDetail(title) {
   epList.innerHTML = eps
     .map((ep) => `
     <li class="ep" data-no="${ep.no}">
-      <div class="ep-thumb" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
-        ${c.emoji}<span class="ep-play">▶</span>
+      <div class="ep-cover" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
+        <span class="emoji">${c.emoji}</span>
+        <span class="ep-no">EP ${ep.no}</span>
+        <span class="ep-flag ${ep.free ? "free" : "locked"}">${ep.free ? "Free" : "🔒 Members"}</span>
+        <span class="ep-dur">${ep.time}</span>
+        <span class="ep-play">▶</span>
       </div>
       <div class="ep-info">
         <div class="ep-title">${ep.no}. ${ep.title}</div>
-        <div class="ep-sub">${ep.time}</div>
       </div>
-      <span class="ep-flag ${ep.free ? "free" : "locked"}">${ep.free ? "Free" : "🔒 Members"}</span>
     </li>`)
     .join("");
 
