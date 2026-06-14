@@ -27,34 +27,90 @@ const COURSES = [
 ];
 
 const grid = document.getElementById("grid");
+const shelfEmpty = document.getElementById("shelfEmpty");
+const shelfBtn = document.getElementById("shelfBtn");
+const shelfCount = document.getElementById("shelfCount");
+
 let activeCat = "all";
 let activeView = "courses";
+let shelfOnly = false;
+
+// ---- Shelf persistence (saved courses live in the browser) ----
+const STORE_KEY = "climax.shelf";
+const loadShelf = () => {
+  try { return new Set(JSON.parse(localStorage.getItem(STORE_KEY)) || []); }
+  catch { return new Set(); }
+};
+const saved = loadShelf();
+const persist = () => localStorage.setItem(STORE_KEY, JSON.stringify([...saved]));
+
+function updateShelfUI() {
+  shelfCount.textContent = saved.size;
+  shelfBtn.classList.toggle("active", shelfOnly);
+}
 
 function render() {
   const items = COURSES.filter((c) => {
     const catOk = activeCat === "all" || c.cat === activeCat;
-    const viewOk = activeView === "courses" ? true : true; // All videos shows everything; Courses also shows all here
-    return catOk && viewOk;
+    const shelfOk = !shelfOnly || saved.has(c.title);
+    return catOk && shelfOk;
   });
 
   grid.innerHTML = items
-    .map(
-      (c) => `
+    .map((c) => {
+      const isSaved = saved.has(c.title);
+      return `
     <article class="card">
       <div class="card-thumb" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
         <span class="tag">Explicit</span>
+        <button class="save-btn ${isSaved ? "saved" : ""}" data-title="${c.title}"
+          aria-label="${isSaved ? "Remove from shelf" : "Add to shelf"}"
+          title="${isSaved ? "On your shelf" : "Add to shelf"}">${isSaved ? "🔖" : "➕"}</button>
         <span class="emoji">${c.emoji}</span>
         <div class="meta">
           <span class="pill">❤️ ${c.likes}</span>
           <span class="pill">${c.time}</span>
         </div>
       </div>
-      <h3 class="card-title">${c.title}</h3>
-      <p class="card-cat">${c.label}</p>
-    </article>`
-    )
+      <div class="card-foot">
+        <div>
+          <h3 class="card-title">${c.title}</h3>
+          <p class="card-cat">${c.label}</p>
+        </div>
+        <button class="add-shelf ${isSaved ? "saved" : ""}" data-title="${c.title}">
+          ${isSaved ? "✓ On shelf" : "+ Add to shelf"}
+        </button>
+      </div>
+    </article>`;
+    })
     .join("");
+
+  const empty = shelfOnly && items.length === 0;
+  shelfEmpty.hidden = !empty;
+  updateShelfUI();
 }
+
+// Toggle a course on/off the shelf (works from either button)
+function toggleSave(title) {
+  if (saved.has(title)) saved.delete(title);
+  else saved.add(title);
+  persist();
+  render();
+}
+
+grid.addEventListener("click", (e) => {
+  const btn = e.target.closest(".save-btn, .add-shelf");
+  if (!btn) return;
+  e.preventDefault();
+  toggleSave(btn.dataset.title);
+});
+
+// "My shelf" button in the nav filters to saved courses
+shelfBtn.addEventListener("click", () => {
+  shelfOnly = !shelfOnly;
+  if (shelfOnly) document.getElementById("courses").scrollIntoView({ behavior: "smooth" });
+  render();
+});
 
 // Category filters
 document.getElementById("filters").addEventListener("click", (e) => {

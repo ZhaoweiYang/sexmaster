@@ -26,6 +26,9 @@
       <a href="#voices">Voices</a>
     </nav>
     <div class="nav-actions">
+      <button class="shelf-btn" id="shelfBtn" aria-label="My shelf">
+        🔖 My shelf <span class="shelf-count" id="shelfCount">0</span>
+      </button>
       <a class="ghost" href="#">Log in</a>
       <a class="cta" href="#pricing">Become a member</a>
     </div>
@@ -102,6 +105,9 @@
       </div>
 
       <div class="grid" id="grid"><!-- cards injected by script.js --></div>
+      <p class="shelf-empty" id="shelfEmpty" hidden>
+        Your shelf is empty. Tap the 🔖 on any course to save it for later.
+      </p>
     </section>
 
     <!-- Method -->
