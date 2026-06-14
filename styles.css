@@ -468,6 +468,51 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
 .app-topbar { display: none; }
 .tabbar { display: none; }
 .me-screen { display: none; }
+.banner { display: none; }
+
+/* Banner carousel (mobile only) */
+.banner { padding: 16px 0 6px; }
+.banner-track {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.banner-track::-webkit-scrollbar { display: none; }
+.slide {
+  flex: 0 0 86%;
+  scroll-snap-align: start;
+  min-height: 178px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 24px 22px;
+  border-radius: 20px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--a), var(--b));
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+}
+.slide-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; opacity: 0.85; }
+.slide h2 { font-size: 30px; line-height: 1.05; }
+.slide p { font-size: 14px; opacity: 0.92; margin-bottom: 4px; }
+.slide .cta {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.95);
+  color: #1a1320;
+  box-shadow: none;
+  padding: 10px 20px;
+  font-size: 14px;
+}
+.banner-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+.dot {
+  width: 7px; height: 7px; padding: 0; border: none; cursor: pointer;
+  border-radius: 50%; background: rgba(255,255,255,0.25); transition: all 0.25s ease;
+}
+.dot.active { width: 18px; border-radius: 100px; background: var(--magenta); }
 
 .me-head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
 .me-avatar {
@@ -513,15 +558,9 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   .nav, .promo, .props, .method, .voices, .pricing, .final, .footer { display: none; }
   body { padding-bottom: 72px; }
 
-  /* The hero becomes the cover banner at the top of the 内容 tab */
-  .hero { display: none; padding: 26px 16px 6px; }
-  body[data-tab="home"] .hero { display: block; }
-  .hero h1 { font-size: clamp(40px, 13vw, 60px); }
-  .lede { margin-top: 16px; font-size: 16px; }
-  .hero-cta { flex-direction: column; align-items: stretch; margin-top: 22px; }
-  .hero-cta .cta, .hero-cta .ghost { width: 100%; text-align: center; }
-  .hero-trust { margin-top: 26px; gap: 16px 24px; }
-  .eyebrow { margin-bottom: 14px; }
+  /* A swipeable banner carousel sits atop the 内容 tab (replaces hero) */
+  .hero { display: none; }
+  body[data-tab="home"] .banner { display: block; }
 
   .app-topbar {
     display: flex; align-items: center; justify-content: space-between;
