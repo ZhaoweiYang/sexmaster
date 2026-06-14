@@ -34,6 +34,12 @@
     </div>
   </header>
 
+  <!-- Mobile app top bar (mobile only) -->
+  <div class="app-topbar">
+    <span class="brand">Climax<sup>™</sup></span>
+    <span class="app-title" id="appTitle">内容</span>
+  </div>
+
   <main id="top">
     <!-- Hero -->
     <section class="hero">
@@ -202,7 +208,35 @@
       <h2>Tonight could be the best night<br />you've ever had together.</h2>
       <a class="cta lg" href="#pricing">Become a master of intimacy</a>
     </section>
+
+    <!-- "我的" profile screen (mobile only) -->
+    <section class="me-screen" id="meScreen">
+      <div class="me-head">
+        <div class="me-avatar">🙂</div>
+        <div>
+          <h2>Hi, 学习者</h2>
+          <p>登录解锁全部课程与学习进度</p>
+        </div>
+      </div>
+      <a class="cta full" href="#">登录 / 注册</a>
+      <div class="me-promo">🌸 会员限时 70% OFF — 成为做爱大师，从今晚开始</div>
+      <ul class="me-list">
+        <li data-go="shelf">🔖 我的书架 <span class="me-count" id="meShelfCount">0</span><span class="chev">›</span></li>
+        <li>📈 学习记录<span class="chev">›</span></li>
+        <li>💞 我的伴侣<span class="chev">›</span></li>
+        <li>⚙️ 设置<span class="chev">›</span></li>
+        <li>❓ 帮助与隐私<span class="chev">›</span></li>
+      </ul>
+      <p class="me-foot">Climax™ · 仅限成年人 18+</p>
+    </section>
   </main>
+
+  <!-- Bottom tab bar (mobile only) -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-tab="home"><span class="tab-ico">🎬</span>内容</button>
+    <button class="tab" data-tab="shelf"><span class="tab-ico">🔖</span>已加入<span class="tab-badge" id="tabBadge" hidden>0</span></button>
+    <button class="tab" data-tab="me"><span class="tab-ico">👤</span>我的</button>
+  </nav>
 
   <footer class="footer">
     <div class="foot-top">

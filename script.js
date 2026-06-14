@@ -47,6 +47,7 @@ const persist = () => localStorage.setItem(STORE_KEY, JSON.stringify([...saved])
 function updateShelfUI() {
   shelfCount.textContent = saved.size;
   shelfBtn.classList.toggle("active", shelfOnly);
+  if (typeof syncShelfBadges === "function") syncShelfBadges();
 }
 
 function render() {
@@ -105,12 +106,50 @@ grid.addEventListener("click", (e) => {
   toggleSave(btn.dataset.title);
 });
 
-// "My shelf" button in the nav filters to saved courses
+// "My shelf" button in the desktop nav filters to saved courses
 shelfBtn.addEventListener("click", () => {
   shelfOnly = !shelfOnly;
   if (shelfOnly) document.getElementById("courses").scrollIntoView({ behavior: "smooth" });
   render();
 });
+
+// ---- Mobile short-drama style bottom tabs: 内容 / 已加入 / 我的 ----
+const TAB_TITLES = { home: "内容", shelf: "已加入", me: "我的" };
+const appTitle = document.getElementById("appTitle");
+const tabBadge = document.getElementById("tabBadge");
+const meShelfCount = document.getElementById("meShelfCount");
+
+function setTab(tab) {
+  document.body.dataset.tab = tab;
+  document.querySelectorAll(".tab").forEach((t) =>
+    t.classList.toggle("active", t.dataset.tab === tab)
+  );
+  appTitle.textContent = TAB_TITLES[tab] || "";
+  // The "已加入" tab reuses the shelf-only filter
+  shelfOnly = tab === "shelf";
+  window.scrollTo({ top: 0 });
+  render();
+}
+
+document.getElementById("tabbar").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (tab) setTab(tab.dataset.tab);
+});
+
+// Tapping "我的书架" inside the profile screen jumps to the 已加入 tab
+document.querySelector('.me-list [data-go="shelf"]')
+  ?.addEventListener("click", () => setTab("shelf"));
+
+// Keep the mobile shelf counts in sync whenever the shelf changes
+const syncShelfBadges = () => {
+  tabBadge.textContent = saved.size;
+  tabBadge.hidden = saved.size === 0;
+  if (meShelfCount) meShelfCount.textContent = saved.size;
+};
+
+// initialise mobile state
+document.body.dataset.tab = "home";
+syncShelfBadges();
 
 // Category filters
 document.getElementById("filters").addEventListener("click", (e) => {
