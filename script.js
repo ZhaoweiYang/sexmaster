@@ -189,6 +189,13 @@ document.addEventListener("keydown", (e) => {
 detailSave.addEventListener("click", () => {
   if (currentDetail) { toggleSave(currentDetail.title); updateDetailSave(); }
 });
+document.getElementById("detailPlay").addEventListener("click", () => {
+  const first = epList.querySelector(".ep");
+  if (!first) return;
+  epList.querySelectorAll(".ep").forEach((x) => x.classList.remove("playing"));
+  first.classList.add("playing");
+  first.scrollIntoView({ behavior: "smooth", block: "center" });
+});
 epList.addEventListener("click", (e) => {
   const ep = e.target.closest(".ep");
   if (!ep) return;
