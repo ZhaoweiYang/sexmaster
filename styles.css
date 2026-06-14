@@ -76,6 +76,12 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   letter-spacing: -0.02em;
 }
 .brand sup { font-size: 11px; opacity: 0.7; }
+.brand-pal {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 .nav-links { display: flex; gap: 28px; font-size: 15px; color: var(--muted); }
 .nav-links a:hover { color: var(--txt); }
 .nav-actions { display: flex; align-items: center; gap: 18px; }
@@ -468,51 +474,33 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
 .app-topbar { display: none; }
 .tabbar { display: none; }
 .me-screen { display: none; }
-.banner { display: none; }
+.home-cover { display: none; }
 
-/* Banner carousel (mobile only) */
-.banner { padding: 16px 0 6px; }
-.banner-track {
-  display: flex;
-  gap: 12px;
-  padding: 0 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.banner-track::-webkit-scrollbar { display: none; }
-.slide {
-  flex: 0 0 86%;
-  scroll-snap-align: start;
-  min-height: 178px;
+/* Mobile home cover — a single banner expressing the platform's pitch */
+.home-cover {
+  margin: 16px 16px 6px;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 7px;
-  padding: 24px 22px;
-  border-radius: 20px;
+  gap: 9px;
+  padding: 30px 24px;
+  border-radius: 22px;
   color: #fff;
-  background: linear-gradient(135deg, var(--a), var(--b));
-  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  background: linear-gradient(135deg, #ff2d7e 0%, #ff5fa2 48%, #ff8a5c 100%);
+  box-shadow: 0 16px 40px rgba(255,61,139,0.3);
 }
-.slide-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; opacity: 0.85; }
-.slide h2 { font-size: 30px; line-height: 1.05; }
-.slide p { font-size: 14px; opacity: 0.92; margin-bottom: 4px; }
-.slide .cta {
+.slide-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; opacity: 0.9; }
+.home-cover h2 { font-size: 33px; line-height: 1.04; }
+.home-cover p { font-size: 15px; opacity: 0.94; margin-bottom: 6px; }
+.home-cover .cta {
   align-self: flex-start;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.96);
   color: #1a1320;
   box-shadow: none;
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 12px 22px;
+  font-size: 15px;
 }
-.banner-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
-.dot {
-  width: 7px; height: 7px; padding: 0; border: none; cursor: pointer;
-  border-radius: 50%; background: rgba(255,255,255,0.25); transition: all 0.25s ease;
-}
-.dot.active { width: 18px; border-radius: 100px; background: var(--magenta); }
 
 .me-head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
 .me-avatar {
@@ -678,9 +666,9 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   .nav, .promo, .props, .method, .voices, .pricing, .final, .footer { display: none; }
   body { padding-bottom: 72px; }
 
-  /* A swipeable banner carousel sits atop the Home tab (replaces hero) */
+  /* A single selling-point cover sits atop the Home tab (replaces hero) */
   .hero { display: none; }
-  body[data-tab="home"] .banner { display: block; }
+  body[data-tab="home"] .home-cover { display: flex; }
 
   .app-topbar {
     display: flex; align-items: center; justify-content: space-between;

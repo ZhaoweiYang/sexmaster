@@ -277,51 +277,6 @@ document.querySelectorAll(".seg").forEach((seg) => {
   });
 });
 
-// ---- Mobile home banner carousel (swipeable + autoplay + dots) ----
-const banner = document.getElementById("banner");
-if (banner) {
-  const track = document.getElementById("bannerTrack");
-  const dotsWrap = document.getElementById("bannerDots");
-  const slides = [...track.children];
-  let current = 0;
-
-  slides.forEach((_, i) => {
-    const d = document.createElement("button");
-    d.className = "dot" + (i === 0 ? " active" : "");
-    d.setAttribute("aria-label", `Slide ${i + 1}`);
-    d.addEventListener("click", () => goTo(i));
-    dotsWrap.appendChild(d);
-  });
-  const dots = [...dotsWrap.children];
-
-  const targetLeft = (i) => slides[i].offsetLeft - 16; // 16 = track padding-left
-  const goTo = (i) => track.scrollTo({ left: targetLeft(i), behavior: "smooth" });
-  const setActive = (i) => {
-    current = i;
-    dots.forEach((d, k) => d.classList.toggle("active", k === i));
-  };
-
-  let raf;
-  track.addEventListener("scroll", () => {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => {
-      let nearest = 0, best = Infinity;
-      slides.forEach((_, i) => {
-        const dist = Math.abs(track.scrollLeft - targetLeft(i));
-        if (dist < best) { best = dist; nearest = i; }
-      });
-      if (nearest !== current) setActive(nearest);
-    });
-  });
-
-  let timer;
-  const play = () => { stop(); timer = setInterval(() => goTo((current + 1) % slides.length), 4500); };
-  const stop = () => clearInterval(timer);
-  track.addEventListener("touchstart", stop, { passive: true });
-  track.addEventListener("touchend", () => setTimeout(play, 4500), { passive: true });
-  play();
-}
-
 // Dismissible promo bar
 const promo = document.getElementById("promo");
 if (promo) {

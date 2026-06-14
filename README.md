@@ -1,4 +1,4 @@
-# Climax™ — The premium school of pleasure
+# climaxPal — The premium school of pleasure
 
 A high-end sex-education landing page. The product teaches people the art and
 science of intimacy so they can become confident, masterful lovers and the
