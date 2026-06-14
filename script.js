@@ -120,7 +120,9 @@ const EP_TEMPLATES = [
 ];
 const EP_TIMES = ["03:42", "06:15", "07:44", "05:20", "08:55", "06:34", "11:30", "04:01"];
 
-// Stable per-series episode list (first episode is free, rest are members-only)
+const EP_COSTS = [5, 8, 10, 12]; // unlock-credit price tiers
+
+// Stable per-series episode list (first episode is free, rest cost unlock credits)
 function episodesFor(course) {
   const n = 5 + (course.title.length % 4); // 5–8 episodes
   return Array.from({ length: n }, (_, i) => ({
@@ -128,8 +130,32 @@ function episodesFor(course) {
     title: EP_TEMPLATES[i % EP_TEMPLATES.length],
     time: EP_TIMES[(i + course.title.length) % EP_TIMES.length],
     free: i === 0,
+    cost: i === 0 ? 0 : EP_COSTS[(i + course.title.length) % EP_COSTS.length],
   }));
 }
+
+// ---- Unlock credits (spent to unlock a lesson without a membership) ----
+const CREDITS_KEY = "climaxpal.credits";
+const UNLOCKED_KEY = "climaxpal.unlocked";
+let credits = (() => {
+  const v = parseInt(localStorage.getItem(CREDITS_KEY), 10);
+  return Number.isFinite(v) ? v : 30; // new visitors start with 30 credits
+})();
+const unlockedSet = (() => {
+  try { return new Set(JSON.parse(localStorage.getItem(UNLOCKED_KEY)) || []); }
+  catch { return new Set(); }
+})();
+const persistCredits = () => localStorage.setItem(CREDITS_KEY, String(credits));
+const persistUnlocked = () => localStorage.setItem(UNLOCKED_KEY, JSON.stringify([...unlockedSet]));
+const epKey = (course, ep) => `${slug(course.title)}-${ep.no}`;
+
+function updateCreditsUI() {
+  const chip = document.getElementById("creditsChip");
+  const me = document.getElementById("meCredits");
+  if (chip) chip.textContent = `🔑 ${credits} credits`;
+  if (me) me.textContent = credits;
+}
+updateCreditsUI();
 
 // ---- Series detail overlay ----
 const detail = document.getElementById("detail");
@@ -148,6 +174,35 @@ function updateDetailSave() {
   detailSave.dataset.title = currentDetail.title;
   detailSave.classList.toggle("saved", isSaved);
   detailSave.textContent = isSaved ? "✓ On shelf" : "+ Add to shelf";
+}
+
+function renderEpisodes(c) {
+  const eps = episodesFor(c);
+  epList.innerHTML = eps
+    .map((ep) => {
+      const unlocked = ep.free || unlockedSet.has(epKey(c, ep));
+      const flag = ep.free
+        ? `<span class="ep-flag free">Free</span>`
+        : unlocked
+          ? `<span class="ep-flag unlocked">✓ Unlocked</span>`
+          : `<span class="ep-flag cost">🔑 ${ep.cost}</span>`;
+      return `
+    <li class="ep ${unlocked ? "is-unlocked" : ""}" data-no="${ep.no}">
+      <div class="ep-cover" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
+        <img class="cover-img" src="${coverUrl(slug(c.title) + '-' + ep.no)}" loading="lazy" alt="" onerror="this.remove()">
+        <span class="cover-tint"></span>
+        <span class="emoji">${c.emoji}</span>
+        <span class="ep-no">EP ${ep.no}</span>
+        ${flag}
+        <span class="ep-dur">${ep.time}</span>
+        <span class="ep-play">${unlocked ? "▶" : "🔒"}</span>
+      </div>
+      <div class="ep-info">
+        <div class="ep-title">${ep.no}. ${ep.title}</div>
+      </div>
+    </li>`;
+    })
+    .join("");
 }
 
 function openDetail(title) {
@@ -169,23 +224,7 @@ function openDetail(title) {
     `An expert-led series on ${c.label.toLowerCase()} — ${eps.length} guided lessons you can follow at your own pace, on your own terms.`;
   updateDetailSave();
 
-  epList.innerHTML = eps
-    .map((ep) => `
-    <li class="ep" data-no="${ep.no}">
-      <div class="ep-cover" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
-        <img class="cover-img" src="${coverUrl(slug(c.title) + '-' + ep.no)}" loading="lazy" alt="" onerror="this.remove()">
-        <span class="cover-tint"></span>
-        <span class="emoji">${c.emoji}</span>
-        <span class="ep-no">EP ${ep.no}</span>
-        <span class="ep-flag ${ep.free ? "free" : "locked"}">${ep.free ? "Free" : "🔒 Members"}</span>
-        <span class="ep-dur">${ep.time}</span>
-        <span class="ep-play">▶</span>
-      </div>
-      <div class="ep-info">
-        <div class="ep-title">${ep.no}. ${ep.title}</div>
-      </div>
-    </li>`)
-    .join("");
+  renderEpisodes(c);
 
   detail.hidden = false;
   document.body.classList.add("detail-open");
@@ -216,9 +255,45 @@ unlock.addEventListener("click", (e) => {
   if (e.target.hasAttribute("data-close")) closeUnlock();
 });
 
-document.getElementById("detailPlay").addEventListener("click", openUnlock);
+function playEp(li) {
+  epList.querySelectorAll(".ep").forEach((x) => x.classList.remove("playing"));
+  li.classList.add("playing");
+}
+
+// Try to view an episode: free/unlocked → play; else spend credits; else paywall
+function viewEpisode(li) {
+  if (!currentDetail) return;
+  const no = Number(li.dataset.no);
+  const ep = episodesFor(currentDetail).find((x) => x.no === no);
+  if (!ep) return;
+  const key = epKey(currentDetail, ep);
+
+  if (ep.free || unlockedSet.has(key)) { playEp(li); return; }
+
+  if (credits >= ep.cost) {
+    credits -= ep.cost;
+    unlockedSet.add(key);
+    persistCredits();
+    persistUnlocked();
+    updateCreditsUI();
+    renderEpisodes(currentDetail);
+    const again = epList.querySelector(`.ep[data-no="${no}"]`);
+    if (again) playEp(again);
+  } else {
+    // Not enough unlock credits → send them to delock to get more
+    openUnlock();
+  }
+}
+
 epList.addEventListener("click", (e) => {
-  if (e.target.closest(".ep")) openUnlock();
+  const li = e.target.closest(".ep");
+  if (li) viewEpisode(li);
+});
+
+// "Play Episode 1" plays the free first episode
+document.getElementById("detailPlay").addEventListener("click", () => {
+  const first = epList.querySelector(".ep");
+  if (first) viewEpisode(first);
 });
 
 grid.addEventListener("click", (e) => {
