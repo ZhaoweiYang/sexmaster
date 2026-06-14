@@ -558,7 +558,7 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   .nav, .promo, .props, .method, .voices, .pricing, .final, .footer { display: none; }
   body { padding-bottom: 72px; }
 
-  /* A swipeable banner carousel sits atop the 内容 tab (replaces hero) */
+  /* A swipeable banner carousel sits atop the Home tab (replaces hero) */
   .hero { display: none; }
   body[data-tab="home"] .banner { display: block; }
 

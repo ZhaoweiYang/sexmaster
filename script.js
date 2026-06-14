@@ -113,8 +113,8 @@ shelfBtn.addEventListener("click", () => {
   render();
 });
 
-// ---- Mobile short-drama style bottom tabs: 内容 / 已加入 / 我的 ----
-const TAB_TITLES = { home: "内容", shelf: "已加入", me: "我的" };
+// ---- Mobile short-drama style bottom tabs: Home / Saved / Me ----
+const TAB_TITLES = { home: "Home", shelf: "Saved", me: "Me" };
 const appTitle = document.getElementById("appTitle");
 const tabBadge = document.getElementById("tabBadge");
 const meShelfCount = document.getElementById("meShelfCount");
@@ -125,7 +125,7 @@ function setTab(tab) {
     t.classList.toggle("active", t.dataset.tab === tab)
   );
   appTitle.textContent = TAB_TITLES[tab] || "";
-  // The "已加入" tab reuses the shelf-only filter
+  // The "Saved" tab reuses the shelf-only filter
   shelfOnly = tab === "shelf";
   window.scrollTo({ top: 0 });
   render();
@@ -136,7 +136,7 @@ document.getElementById("tabbar").addEventListener("click", (e) => {
   if (tab) setTab(tab.dataset.tab);
 });
 
-// Tapping "我的书架" inside the profile screen jumps to the 已加入 tab
+// Tapping "My shelf" inside the profile screen jumps to the Saved tab
 document.querySelector('.me-list [data-go="shelf"]')
   ?.addEventListener("click", () => setTab("shelf"));
 
@@ -182,7 +182,7 @@ if (banner) {
   slides.forEach((_, i) => {
     const d = document.createElement("button");
     d.className = "dot" + (i === 0 ? " active" : "");
-    d.setAttribute("aria-label", `第 ${i + 1} 张`);
+    d.setAttribute("aria-label", `Slide ${i + 1}`);
     d.addEventListener("click", () => goTo(i));
     dotsWrap.appendChild(d);
   });
