@@ -269,6 +269,23 @@
     <button class="tab" data-tab="me"><span class="tab-ico">👤</span>Me</button>
   </nav>
 
+  <!-- Series detail / episode list (overlay) -->
+  <div class="detail" id="detail" hidden>
+    <div class="detail-inner">
+      <button class="detail-back" id="detailBack">← Back</button>
+      <div class="detail-cover" id="detailCover"><span class="emoji"></span><span class="tag">Explicit</span></div>
+      <div class="detail-body">
+        <span class="detail-cat" id="detailCat"></span>
+        <h2 id="detailTitle"></h2>
+        <p class="detail-meta" id="detailMeta"></p>
+        <p class="detail-desc" id="detailDesc"></p>
+        <button class="add-shelf" id="detailSave"></button>
+        <h3 class="ep-head">Episodes</h3>
+        <ul class="ep-list" id="epList"></ul>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="foot-top">
       <a class="brand" href="#top">Climax<sup>™</sup></a>

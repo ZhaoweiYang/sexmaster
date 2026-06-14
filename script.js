@@ -61,7 +61,7 @@ function render() {
     .map((c) => {
       const isSaved = saved.has(c.title);
       return `
-    <article class="card">
+    <article class="card" data-title="${c.title}">
       <div class="card-thumb" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
         <span class="tag">Explicit</span>
         <button class="save-btn ${isSaved ? "saved" : ""}" data-title="${c.title}"
@@ -76,7 +76,7 @@ function render() {
       <div class="card-foot">
         <div>
           <h3 class="card-title">${c.title}</h3>
-          <p class="card-cat">${c.label}</p>
+          <p class="card-cat">${c.label} · ${episodesFor(c).length} episodes</p>
         </div>
         <button class="add-shelf ${isSaved ? "saved" : ""}" data-title="${c.title}">
           ${isSaved ? "✓ On shelf" : "+ Add to shelf"}
@@ -99,11 +99,108 @@ function toggleSave(title) {
   render();
 }
 
+// ---- Series → episodes ----
+const EP_TEMPLATES = [
+  "Introduction & what you'll learn",
+  "The fundamentals",
+  "Step-by-step technique",
+  "Reading your partner's cues",
+  "Common mistakes to avoid",
+  "Putting it into practice",
+  "Going deeper",
+  "Bringing it all together",
+];
+const EP_TIMES = ["03:42", "06:15", "07:44", "05:20", "08:55", "06:34", "11:30", "04:01"];
+
+// Stable per-series episode list (first episode is free, rest are members-only)
+function episodesFor(course) {
+  const n = 5 + (course.title.length % 4); // 5–8 episodes
+  return Array.from({ length: n }, (_, i) => ({
+    no: i + 1,
+    title: EP_TEMPLATES[i % EP_TEMPLATES.length],
+    time: EP_TIMES[(i + course.title.length) % EP_TIMES.length],
+    free: i === 0,
+  }));
+}
+
+// ---- Series detail overlay ----
+const detail = document.getElementById("detail");
+const detailCover = document.getElementById("detailCover");
+const detailCat = document.getElementById("detailCat");
+const detailTitle = document.getElementById("detailTitle");
+const detailMeta = document.getElementById("detailMeta");
+const detailDesc = document.getElementById("detailDesc");
+const detailSave = document.getElementById("detailSave");
+const epList = document.getElementById("epList");
+let currentDetail = null;
+
+function updateDetailSave() {
+  if (!currentDetail) return;
+  const isSaved = saved.has(currentDetail.title);
+  detailSave.dataset.title = currentDetail.title;
+  detailSave.classList.toggle("saved", isSaved);
+  detailSave.textContent = isSaved ? "✓ On shelf" : "+ Add to shelf";
+}
+
+function openDetail(title) {
+  const c = COURSES.find((x) => x.title === title);
+  if (!c) return;
+  currentDetail = c;
+  const eps = episodesFor(c);
+
+  detailCover.style.background = `linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]})`;
+  detailCover.querySelector(".emoji").textContent = c.emoji;
+  detailCat.textContent = c.label;
+  detailTitle.textContent = c.title;
+  detailMeta.textContent = `Series · ${eps.length} episodes · ❤️ ${c.likes}`;
+  detailDesc.textContent =
+    `An expert-led series on ${c.label.toLowerCase()} — ${eps.length} guided lessons you can follow at your own pace, on your own terms.`;
+  updateDetailSave();
+
+  epList.innerHTML = eps
+    .map((ep) => `
+    <li class="ep" data-no="${ep.no}">
+      <div class="ep-thumb" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
+        ${c.emoji}<span class="ep-play">▶</span>
+      </div>
+      <div class="ep-info">
+        <div class="ep-title">${ep.no}. ${ep.title}</div>
+        <div class="ep-sub">${ep.time}</div>
+      </div>
+      <span class="ep-flag ${ep.free ? "free" : "locked"}">${ep.free ? "Free" : "🔒 Members"}</span>
+    </li>`)
+    .join("");
+
+  detail.hidden = false;
+  document.body.classList.add("detail-open");
+  detail.scrollTop = 0;
+}
+
+function closeDetail() {
+  detail.hidden = true;
+  document.body.classList.remove("detail-open");
+  currentDetail = null;
+}
+
+document.getElementById("detailBack").addEventListener("click", closeDetail);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !detail.hidden) closeDetail();
+});
+detailSave.addEventListener("click", () => {
+  if (currentDetail) { toggleSave(currentDetail.title); updateDetailSave(); }
+});
+epList.addEventListener("click", (e) => {
+  const ep = e.target.closest(".ep");
+  if (!ep) return;
+  epList.querySelectorAll(".ep").forEach((x) => x.classList.remove("playing"));
+  ep.classList.add("playing");
+});
+
 grid.addEventListener("click", (e) => {
   const btn = e.target.closest(".save-btn, .add-shelf");
-  if (!btn) return;
-  e.preventDefault();
-  toggleSave(btn.dataset.title);
+  if (btn) { e.preventDefault(); toggleSave(btn.dataset.title); return; }
+  const card = e.target.closest(".card");
+  if (card) openDetail(card.dataset.title);
 });
 
 // "My shelf" button in the desktop nav filters to saved courses
