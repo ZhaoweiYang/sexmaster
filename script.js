@@ -26,6 +26,12 @@ const COURSES = [
   { title: "Understanding your own body", cat: "health", label: "Sexual health", emoji: "🌷", grad: ["#ff5fa2", "#ff8a5c"], time: "10:05", likes: 95, view: "courses" },
 ];
 
+// ---- Cover images (free, commercial-use stock via Lorem Picsum) ----
+// Deterministic per-seed so a series/episode always shows the same photo.
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const coverUrl = (seed, w = 800, h = 600) =>
+  `https://picsum.photos/seed/cp-${encodeURIComponent(seed)}/${w}/${h}`;
+
 const grid = document.getElementById("grid");
 const shelfEmpty = document.getElementById("shelfEmpty");
 const shelfBtn = document.getElementById("shelfBtn");
@@ -63,6 +69,8 @@ function render() {
       return `
     <article class="card" data-title="${c.title}">
       <div class="card-thumb" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
+        <img class="cover-img" src="${coverUrl(slug(c.title))}" loading="lazy" alt="" onerror="this.remove()">
+        <span class="cover-tint"></span>
         <span class="tag">Explicit</span>
         <button class="save-btn ${isSaved ? "saved" : ""}" data-title="${c.title}"
           aria-label="${isSaved ? "Remove from shelf" : "Add to shelf"}"
@@ -149,6 +157,10 @@ function openDetail(title) {
   const eps = episodesFor(c);
 
   detailCover.style.background = `linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]})`;
+  const coverImg = document.getElementById("detailCoverImg");
+  coverImg.style.display = "";
+  coverImg.onerror = () => { coverImg.style.display = "none"; };
+  coverImg.src = coverUrl(slug(c.title), 1200, 720);
   detailCover.querySelector(".emoji").textContent = c.emoji;
   detailCat.textContent = c.label;
   detailTitle.textContent = c.title;
@@ -161,6 +173,8 @@ function openDetail(title) {
     .map((ep) => `
     <li class="ep" data-no="${ep.no}">
       <div class="ep-cover" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
+        <img class="cover-img" src="${coverUrl(slug(c.title) + '-' + ep.no)}" loading="lazy" alt="" onerror="this.remove()">
+        <span class="cover-tint"></span>
         <span class="emoji">${c.emoji}</span>
         <span class="ep-no">EP ${ep.no}</span>
         <span class="ep-flag ${ep.free ? "free" : "locked"}">${ep.free ? "Free" : "🔒 Members"}</span>

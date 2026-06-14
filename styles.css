@@ -43,6 +43,24 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   color: transparent;
 }
 
+/* Cover photo layer (stock images) + on-brand gradient tint */
+.cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.cover-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(150deg, rgba(255,45,126,0.42), rgba(255,138,92,0.26) 55%, rgba(8,7,11,0.5));
+}
+/* Keep labels/controls above the cover photo + tint */
+.tag, .meta, .cover-scrim { z-index: 2; }
+
 /* ---------- Promo bar ---------- */
 .promo {
   background: var(--grad);
@@ -478,6 +496,8 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
 
 /* Mobile home cover — a single banner expressing the platform's pitch */
 .home-cover {
+  position: relative;
+  overflow: hidden;
   margin: 16px 16px 6px;
   min-height: 220px;
   display: flex;
@@ -490,6 +510,10 @@ h1, h2, h3, h4 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; line
   background: linear-gradient(135deg, #ff2d7e 0%, #ff5fa2 48%, #ff8a5c 100%);
   box-shadow: 0 16px 40px rgba(255,61,139,0.3);
 }
+.home-cover > .slide-eyebrow,
+.home-cover > h2,
+.home-cover > p,
+.home-cover > .cta { position: relative; z-index: 2; }
 .slide-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; opacity: 0.9; }
 .home-cover h2 { font-size: 33px; line-height: 1.04; }
 .home-cover p { font-size: 15px; opacity: 0.94; margin-bottom: 6px; }
