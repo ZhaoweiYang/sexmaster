@@ -26,11 +26,39 @@ const COURSES = [
   { title: "Understanding your own body", cat: "health", label: "Sexual health", emoji: "🌷", grad: ["#ff5fa2", "#ff8a5c"], time: "10:05", likes: 95, view: "courses" },
 ];
 
-// ---- Cover images (free, commercial-use stock via Lorem Picsum) ----
-// Deterministic per-seed so a series/episode always shows the same photo.
+// ---- Cover images: generated locally as inline SVG (no external CDN) ----
+// Same-origin data URIs always render (no hotlink/region/blocking issues),
+// are free of copyright, and stay deterministic per seed.
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const coverUrl = (seed, w = 800, h = 600) =>
-  `https://picsum.photos/seed/cp-${encodeURIComponent(seed)}/${w}/${h}`;
+const hashSeed = (str) => {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
+};
+function coverUrl(seed, colors = ["#ff2d7e", "#ff8a5c"], w = 800, h = 600) {
+  const r = hashSeed(seed);
+  const [c1, c2] = colors;
+  const cx1 = 18 + (r % 55), cy1 = 14 + ((r >> 3) % 46);
+  const cx2 = 48 + ((r >> 6) % 48), cy2 = 42 + ((r >> 9) % 50);
+  const r1 = 70 + (r % 120), r2 = 110 + ((r >> 4) % 150);
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'>` +
+    `<defs>` +
+    `<linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${c1}'/><stop offset='1' stop-color='${c2}'/></linearGradient>` +
+    `<radialGradient id='l' cx='${cx1}%' cy='${cy1}%' r='60%'><stop offset='0' stop-color='#fff' stop-opacity='0.55'/><stop offset='1' stop-color='#fff' stop-opacity='0'/></radialGradient>` +
+    `<radialGradient id='d' cx='${cx2}%' cy='${cy2}%' r='60%'><stop offset='0' stop-color='#000' stop-opacity='0.38'/><stop offset='1' stop-color='#000' stop-opacity='0'/></radialGradient>` +
+    `</defs>` +
+    `<rect width='100%' height='100%' fill='url(#g)'/>` +
+    `<circle cx='${(cx1 * w) / 100}' cy='${(cy1 * h) / 100}' r='${r1}' fill='#fff' fill-opacity='0.10'/>` +
+    `<circle cx='${(cx2 * w) / 100}' cy='${(cy2 * h) / 100}' r='${r2}' fill='#000' fill-opacity='0.12'/>` +
+    `<rect width='100%' height='100%' fill='url(#l)'/>` +
+    `<rect width='100%' height='100%' fill='url(#d)'/>` +
+    `</svg>`;
+  return "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
+const homeCoverImg = document.getElementById("homeCoverImg");
+if (homeCoverImg) homeCoverImg.src = coverUrl("home", ["#ff2d7e", "#ff8a5c"], 900, 600);
 
 const grid = document.getElementById("grid");
 const shelfEmpty = document.getElementById("shelfEmpty");
@@ -69,7 +97,7 @@ function render() {
       return `
     <article class="card" data-title="${c.title}">
       <div class="card-thumb" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
-        <img class="cover-img" src="${coverUrl(slug(c.title))}" loading="lazy" alt="" onerror="this.remove()">
+        <img class="cover-img" src="${coverUrl(slug(c.title), c.grad)}" loading="lazy" alt="" onerror="this.remove()">
         <span class="cover-tint"></span>
         <span class="tag">Explicit</span>
         <button class="save-btn ${isSaved ? "saved" : ""}" data-title="${c.title}"
@@ -189,7 +217,7 @@ function renderEpisodes(c) {
       return `
     <li class="ep ${unlocked ? "is-unlocked" : ""}" data-no="${ep.no}">
       <div class="ep-cover" style="background: linear-gradient(135deg, ${c.grad[0]}, ${c.grad[1]});">
-        <img class="cover-img" src="${coverUrl(slug(c.title) + '-' + ep.no)}" loading="lazy" alt="" onerror="this.remove()">
+        <img class="cover-img" src="${coverUrl(slug(c.title) + '-' + ep.no, c.grad)}" loading="lazy" alt="" onerror="this.remove()">
         <span class="cover-tint"></span>
         <span class="emoji">${c.emoji}</span>
         <span class="ep-no">EP ${ep.no}</span>
@@ -215,7 +243,7 @@ function openDetail(title) {
   const coverImg = document.getElementById("detailCoverImg");
   coverImg.style.display = "";
   coverImg.onerror = () => { coverImg.style.display = "none"; };
-  coverImg.src = coverUrl(slug(c.title), 1200, 720);
+  coverImg.src = coverUrl(slug(c.title), c.grad, 1200, 720);
   detailCover.querySelector(".emoji").textContent = c.emoji;
   detailCat.textContent = c.label;
   detailTitle.textContent = c.title;
