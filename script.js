@@ -318,11 +318,8 @@ epList.addEventListener("click", (e) => {
   if (li) viewEpisode(li);
 });
 
-// "Play Episode 1" plays the free first episode
-document.getElementById("detailPlay").addEventListener("click", () => {
-  const first = epList.querySelector(".ep");
-  if (first) viewEpisode(first);
-});
+// The "0元试看" watch CTA opens the free-preview popup
+document.getElementById("detailPlay").addEventListener("click", openUnlock);
 
 grid.addEventListener("click", (e) => {
   const btn = e.target.closest(".save-btn, .add-shelf");
