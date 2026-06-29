@@ -283,42 +283,12 @@ unlock.addEventListener("click", (e) => {
   if (e.target.hasAttribute("data-close")) closeUnlock();
 });
 
-function playEp(li) {
-  epList.querySelectorAll(".ep").forEach((x) => x.classList.remove("playing"));
-  li.classList.add("playing");
-}
-
-// Try to view an episode: free/unlocked → play; else spend credits; else paywall
-function viewEpisode(li) {
-  if (!currentDetail) return;
-  const no = Number(li.dataset.no);
-  const ep = episodesFor(currentDetail).find((x) => x.no === no);
-  if (!ep) return;
-  const key = epKey(currentDetail, ep);
-
-  if (ep.free || unlockedSet.has(key)) { playEp(li); return; }
-
-  if (credits >= ep.cost) {
-    credits -= ep.cost;
-    unlockedSet.add(key);
-    persistCredits();
-    persistUnlocked();
-    updateCreditsUI();
-    renderEpisodes(currentDetail);
-    const again = epList.querySelector(`.ep[data-no="${no}"]`);
-    if (again) playEp(again);
-  } else {
-    // Not enough unlock credits → send them to delock to get more
-    openUnlock();
-  }
-}
-
+// Clicking any episode (the content) opens the 0元试看 free-preview popup
 epList.addEventListener("click", (e) => {
-  const li = e.target.closest(".ep");
-  if (li) viewEpisode(li);
+  if (e.target.closest(".ep")) openUnlock();
 });
 
-// The "0元试看" watch CTA opens the free-preview popup
+// The "0元试看" watch CTA opens the same popup
 document.getElementById("detailPlay").addEventListener("click", openUnlock);
 
 grid.addEventListener("click", (e) => {
